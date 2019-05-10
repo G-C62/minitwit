@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block title %}회원가입{% endblock %}
+
+{% block body %}
+
+{# 사용할 메크로만 import #}
+{% from 'macros.html' import input %}
+
+{% include 'header.html' %}
+
+{% if error %}
+<div class = error>
+    <strong>Error:</strong>{{ error }}
+</div>
+{% endif %}
+
+<form action ="" method="post" >
+    <h5>사용자명</h5>
+    {{ input('username', size=30, value=request.form.username) }}
+    <h5>이메일</h5>
+    {{ input('email', size=30, value=request.form.username) }}
+    <h5>비밀번호</h5>
+    {{ input('password', size=30, value=request.form.username, type='password') }}
+    <h5>비밀번호 확인</h5>
+    {{ input('password2', size=30, value=request.form.username, type='password') }}
+    <br>
+    <br>
+    <div class="actions">
+    {{ input(type='submit', value='회원가입') }}
+    </div>
+    <br>
+</form>
+
+{% include 'footer.html' %}
+{% endblock %}
