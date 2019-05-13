@@ -11,13 +11,16 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # 상수
 DATABASE = r'C:\tmp\minitwit.db'
 PER_PAGE = 30
-DEBUG = True
-SECRET_KEY = 'development key'
-
 
 # app생성
 app = Flask(__name__)
+DEBUG = True
+SECRET_KEY = 'development key'
+
+#설정파일을 import하거나 직접 설정해줌
 app.config.from_object(__name__)
+
+#환경변수로 설정하여 설정파일에 빠르게 접근하도록 도움
 app.config.from_envvar('MINITWIT_SETTINGS', silent=True)
 
 #유저 존재여부 체크 함수
@@ -59,8 +62,8 @@ def query_db(query, args = (), one = False):
 
 # gravatar(md5 import) URL생성
 def gravatar_url(email, size=80):
-    'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
-    (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
+    return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % (md5(email.strip().lower().encode('utf-8')).hexdigest(),
+                                                                   size)
 
 
 # date format
@@ -179,7 +182,7 @@ def timeline():
 @app.route('/<username>')
 def user_timeline(username):
     profile_user = query_db('''
-        SELECT * FROM USER WHERE USER_ID = ?
+        SELECT * FROM USER WHERE USERNAME = ?
     ''', [username], one=True)
 
     if profile_user is None:
@@ -189,11 +192,14 @@ def user_timeline(username):
         followed = query_db('''
             SELECT 1 FROM FOLLOWER WHERE FOLLOWER.WHO_ID = ? AND FOLLOWER.WHOM_ID = ?''',
             [session['user_id'], profile_user['USER_ID']], one=True) is not None
-    return render_template('timeline.html', messages=query_db('''
-        SELECT MESSAGE.*, USER.* FROM MESSAGE, USER 
-        WHERE USER.USER_ID = MESSAGE.AUTHOR_ID AND USER.USER_ID = ? 
-        ORDER BY MESSAGE.PUB_DATE DESC LIMIT ?''',
-        [profile_user['USER_ID'], PER_PAGE]), followed=followed, profile_user=profile_user)
+
+        return render_template('timeline.html', messages=query_db('''
+            SELECT MESSAGE.*, USER.* FROM MESSAGE, USER 
+            WHERE USER.USER_ID = MESSAGE.AUTHOR_ID AND USER.USER_ID = ? 
+            ORDER BY MESSAGE.PUB_DATE DESC LIMIT ?''',
+            [profile_user['USER_ID'], PER_PAGE]), followed=followed, profile_user=profile_user)
+    abort(404)
+
 
 # gravatar 함수를 신사2엔진의 필터로 등록해서 템플릿에서 사용
 app.jinja_env.filters['gravatar'] = gravatar_url
@@ -201,7 +207,7 @@ app.jinja_env.filters['datetimeformat'] = format_datetime
 
 # DB초기화 및 로컬 테스트 서버 구동
 if __name__ == '__main__':
-    init_db()
+    #init_db()
     app.run()
 
 

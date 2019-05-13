@@ -3,7 +3,7 @@
   {% if request.endpoint == 'public_timeline' %}
     Public Timeline
   {% elif request.endpoint == 'user_timeline' %}
-    {{ profile_user.username }}'s Timeline
+    {{ profile_user.USERNAME }}'s Timeline
   {% else %}
     My Timeline
   {% endif %}
@@ -13,15 +13,16 @@
   {% if g.user %}
     {% if request.endpoint == 'user_timeline' %}
       <div class=followstatus>
-      {% if g.user.user_id == profile_user.user_id %}
+      {% if g.user.user_id == profile_user.USER_ID %}
         This is you!
       {% elif followed %}
         You are currently following this user.
-        <a class=unfollow href="{{ url_for('unfollow_user', username=profile_user.username)
+        <a class=unfollow href="{{ url_for('unfollow_user', username=profile_user.USERNAME)
+
           }}">Unfollow user</a>.
       {% else %}
         You are not yet following this user.
-        <a class=follow href="{{ url_for('follow_user', username=profile_user.username)
+        <a class=follow href="{{ url_for('follow_user', username=profile_user.USERNAME)
           }}">Follow user</a>.
       {% endif %}
       </div>
@@ -37,6 +38,7 @@
   {% endif %}
   <ul class=messages>
   {% for message in messages %}
+    {#  #}
     <li><img src="{{ message.EMAIL|gravatar(size=48) }}"><p>
       <strong><a href="{{ url_for('user_timeline', username=message.USERNAME)
       }}">{{ message.USERNAME }}</a></strong>
